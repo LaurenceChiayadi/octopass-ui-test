@@ -1,35 +1,35 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 
-import { fetchOrders } from "../../api/OrderAPI";
-import OrderTable from "../../components/Order/OrderTable";
+import { fetchOrders } from '../../api/OrderAPI';
+import OrderTable from '../../components/Order/OrderTable';
 
-export const Route = createFileRoute("/order/")({
+export const Route = createFileRoute('/order/')({
   component: RouteComponent,
 });
 
 const sortableFields = [
-  "Id",
-  "Customer Id",
-  "Employee Id",
-  "Order Date",
-  "Required Date",
-  "Shipped Date",
-  "Ship Via",
-  "Freight",
-  "Ship Name",
-  "Ship Address",
-  "Ship City",
-  "Ship Postal Code",
-  "Ship Country",
+  'Id',
+  'Customer Id',
+  'Employee Id',
+  'Order Date',
+  'Required Date',
+  'Shipped Date',
+  'Ship Via',
+  'Freight',
+  'Ship Name',
+  'Ship Address',
+  'Ship City',
+  'Ship Postal Code',
+  'Ship Country',
 ];
 
 function RouteComponent() {
   const [sortField, setSortField] = useState(sortableFields[0]);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const { data, error } = useQuery({
-    queryKey: ["orders", { sortField, sortDirection }],
+    queryKey: ['orders', { sortField, sortDirection }],
     queryFn: () => fetchOrders({ sortField, sortDirection }),
   });
 
@@ -40,13 +40,15 @@ function RouteComponent() {
   const handleSortDirectionChange = (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const value = e.target.value as "asc" | "desc";
+    const value = e.target.value as 'asc' | 'desc';
     setSortDirection(value);
   };
 
   if (error) return <div>Error: {error?.message}</div>;
 
   if (!data) return <div>No data found</div>;
+
+  const convertedData: IOrder[] = data.map((order) => ({ order: order }));
 
   return (
     <div className="flex flex-col gap-4">
@@ -76,7 +78,7 @@ function RouteComponent() {
           </select>
         </label>
       </div>
-      <OrderTable orders={data} />
+      <OrderTable orders={convertedData} />
     </div>
   );
 }

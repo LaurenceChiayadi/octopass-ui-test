@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import type { ColumnDef, Row } from "@tanstack/react-table";
+import { useMemo } from 'react';
+import type { ColumnDef, Row } from '@tanstack/react-table';
 
-import Table from "../Table";
-import { convertRawDateToDate } from "../../utils/dateUtils";
-import OrderTableChild from "./OrderTableChild";
+import Table from '../Table';
+import { convertRawDateToDate } from '../../utils/dateUtils';
+import OrderTableChild from './OrderTableChild';
 
 interface OrderTableProps {
   orders: IOrder[];
@@ -13,59 +13,60 @@ const OrderTable = (props: OrderTableProps) => {
   const columns = useMemo<ColumnDef<IOrder>[]>(
     () => [
       {
-        id: "expander",
+        id: 'expander',
         header: () => null,
         cell: ({ row }) => {
+          if (!row.original.orderDetails) return <>{'>'}</>;
           return (
             <button
               {...{
                 onClick: row.getToggleExpandedHandler(),
-                style: { cursor: "pointer" },
+                style: { cursor: 'pointer' },
               }}
             >
-              {row.getIsExpanded() ? "👇" : "👉"}
+              {row.getIsExpanded() ? '👇' : '👉'}
             </button>
           );
         },
       },
       {
-        accessorKey: "order.id",
-        header: "ID",
+        accessorKey: 'order.id',
+        header: 'ID',
       },
       {
-        accessorKey: "order.customerId",
-        header: "Customer",
+        accessorKey: 'order.customerId',
+        header: 'Customer',
       },
       {
-        accessorKey: "order.employeeId",
-        header: "Employee ID",
+        accessorKey: 'order.employeeId',
+        header: 'Employee ID',
       },
       {
         accessorFn: (row) => row.order.orderDate,
-        header: "Order Date",
+        header: 'Order Date',
         cell: (info) => convertRawDateToDate(info.getValue() as string),
       },
       {
         accessorFn: (row) => row.order.requiredDate,
-        header: "Required Date",
+        header: 'Required Date',
         cell: (info) => convertRawDateToDate(info.getValue() as string),
       },
       {
         accessorFn: (row) => row.order.shippedDate,
-        header: "Shipped Date",
+        header: 'Shipped Date',
         cell: (info) => convertRawDateToDate(info.getValue() as string),
       },
       {
-        accessorKey: "order.shipVia",
-        header: "Ship Via",
+        accessorKey: 'order.shipVia',
+        header: 'Ship Via',
       },
-      { accessorKey: "order.freight", header: "Freight" },
+      { accessorKey: 'order.freight', header: 'Freight' },
       {
-        accessorKey: "order.shipName",
-        header: "Ship Name",
+        accessorKey: 'order.shipName',
+        header: 'Ship Name',
       },
       {
-        header: "Ship Address",
+        header: 'Ship Address',
         cell: (info) =>
           `${info.row.original.order.shipAddress}, ${info.row.original.order.shipCity}, ${info.row.original.order.shipPostalCode}, ${info.row.original.order.shipCountry}`,
       },
@@ -78,10 +79,10 @@ const OrderTable = (props: OrderTableProps) => {
   }: {
     row: Row<IOrder>;
   }): React.ReactElement => {
-    return <OrderTableChild orderDetails={row.original.orderDetails} />;
+    if (row.original.orderDetails)
+      return <OrderTableChild orderDetails={row.original.orderDetails} />;
+    return <></>;
   };
-
-  console.log(props.orders);
 
   if (!props.orders || props.orders.length === 0) return <></>;
 

@@ -48,12 +48,12 @@ interface IOrderDetail {
 
 interface IOrder {
   order: IOrderInfo;
-  orderDetails: IOrderDetail[];
+  orderDetails?: IOrderDetail[];
 }
 
 interface IAPIParams {
   pageIndex?: number;
   pageSize?: number;
   sortField?: string;
-  sortDirection?: "asc" | "desc";
+  sortDirection?: 'asc' | 'desc';
 }
