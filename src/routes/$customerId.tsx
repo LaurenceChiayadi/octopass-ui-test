@@ -1,0 +1,33 @@
+import { createFileRoute, useParams } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+
+import { fetchCustomerDetail } from "../api/CustomerAPI";
+import CustomerInfoPanel from "../components/Customer/CustomerInfoPanel";
+import OrderTable from "../components/Order/OrderTable";
+
+export const Route = createFileRoute("/$customerId")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  const params = useParams({ from: "/$customerId" });
+
+  const { data, error, isLoading } = useQuery({
+    queryKey: ["customers"],
+    queryFn: () => fetchCustomerDetail(params.customerId),
+    enabled: !!params.customerId,
+    refetchOnWindowFocus: true,
+  });
+  if (error) return <div>Error: {error?.message}</div>;
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!data) return <div>No data found</div>;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <CustomerInfoPanel customer={data.customer} />
+      <h2 className="text-xl font-semibold">Orders</h2>
+      <OrderTable orders={data.orders} />
+    </div>
+  );
+}
