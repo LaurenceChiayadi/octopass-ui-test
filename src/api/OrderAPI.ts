@@ -9,6 +9,9 @@ export const fetchOrders = async (params: IAPIParams) => {
       params.sortField
     );
   }
+  if (params.filter) {
+    url.searchParams.append('Freight', params.filter);
+  }
 
   url.searchParams.append(
     'skip',

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
@@ -28,6 +28,9 @@ const sortableFields = [
 ];
 
 function RouteComponent() {
+  const [freightFilter, setFreightFilter] = useState('');
+  const [debouncedFreightFilter, setDebouncedFreightFilter] =
+    useState(freightFilter);
   const [sortField, setSortField] = useState(sortableFields[0]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -36,8 +39,17 @@ function RouteComponent() {
   });
 
   const { data, error } = useQuery({
-    queryKey: ['orders', { sortField, sortDirection, pagination }],
-    queryFn: () => fetchOrders({ sortField, sortDirection, pagination }),
+    queryKey: [
+      'orders',
+      { sortField, sortDirection, pagination, debouncedFreightFilter },
+    ],
+    queryFn: () =>
+      fetchOrders({
+        sortField,
+        sortDirection,
+        pagination,
+        filter: debouncedFreightFilter,
+      }),
     placeholderData: keepPreviousData,
   });
 
@@ -83,6 +95,16 @@ function RouteComponent() {
     []
   );
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedFreightFilter(freightFilter);
+    }, 200);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [freightFilter]);
+
   const handleSortFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortField(e.target.value);
   };
@@ -98,6 +120,22 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="w-full mx-auto">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="input"
+        >
+          Freight Filter
+        </label>
+        <input
+          id="input"
+          type="text"
+          value={freightFilter}
+          onChange={(e) => setFreightFilter(e.target.value)}
+          placeholder="Type something..."
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-200 leading-tight focus:outline-none focus:shadow-outline"
+        />
+      </div>
       <div className="flex gap-4">
         <label>
           Sort by:
