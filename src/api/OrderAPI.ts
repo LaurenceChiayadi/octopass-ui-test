@@ -2,12 +2,22 @@ import { API_BASE_URL } from '../constants/api';
 
 export const fetchOrders = async (params: IAPIParams) => {
   const url = new URL('/query/orders', API_BASE_URL);
+
   if (params.sortField && params.sortDirection) {
     url.searchParams.append(
       params.sortDirection === 'asc' ? 'OrderBy' : 'OrderByDesc',
       params.sortField
     );
   }
+
+  url.searchParams.append(
+    'skip',
+    (params.pagination.pageIndex * params.pagination.pageSize).toString()
+  );
+  url.searchParams.append('take', params.pagination.pageSize.toString() ?? 10);
+
+  url.searchParams.append('Include', 'total');
+
   const response = await fetch(url.toString(), {
     method: 'GET',
     headers: {
@@ -20,5 +30,5 @@ export const fetchOrders = async (params: IAPIParams) => {
   }
 
   const data: ISuccessResponse<IOrderInfo> = await response.json();
-  return data.results;
+  return data;
 };

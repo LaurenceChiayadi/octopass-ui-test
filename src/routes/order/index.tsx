@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 
 import { fetchOrders } from '../../api/OrderAPI';
-import OrderTable from '../../components/Order/OrderTable';
+import { convertRawDateToDate } from '../../utils/dateUtils';
+import Table from '../../components/Table';
 
 export const Route = createFileRoute('/order/')({
   component: RouteComponent,
@@ -28,10 +30,58 @@ const sortableFields = [
 function RouteComponent() {
   const [sortField, setSortField] = useState(sortableFields[0]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const { data, error, isFetching } = useQuery({
-    queryKey: ['orders', { sortField, sortDirection }],
-    queryFn: () => fetchOrders({ sortField, sortDirection }),
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
   });
+
+  const { data, error } = useQuery({
+    queryKey: ['orders', { sortField, sortDirection, pagination }],
+    queryFn: () => fetchOrders({ sortField, sortDirection, pagination }),
+    placeholderData: keepPreviousData,
+  });
+
+  const columns = useMemo<ColumnDef<IOrderInfo>[]>(
+    () => [
+      {
+        accessorKey: 'id',
+        header: 'ID',
+      },
+      {
+        accessorKey: 'customerId',
+        header: 'Customer',
+      },
+      {
+        accessorKey: 'employeeId',
+        header: 'Employee ID',
+      },
+      {
+        accessorFn: (row) => row.orderDate,
+        header: 'Order Date',
+        cell: (info) => convertRawDateToDate(info.getValue() as string),
+      },
+      {
+        accessorFn: (row) => row.requiredDate,
+        header: 'Required Date',
+        cell: (info) => convertRawDateToDate(info.getValue() as string),
+      },
+      {
+        accessorFn: (row) => row.shippedDate,
+        header: 'Shipped Date',
+        cell: (info) => convertRawDateToDate(info.getValue() as string),
+      },
+      {
+        accessorKey: 'shipVia',
+        header: 'Ship Via',
+      },
+      { accessorKey: 'freight', header: 'Freight' },
+      {
+        accessorKey: 'shipName',
+        header: 'Ship Name',
+      },
+    ],
+    []
+  );
 
   const handleSortFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortField(e.target.value);
@@ -74,10 +124,15 @@ function RouteComponent() {
           </select>
         </label>
       </div>
-      {isFetching ? (
-        <div>Loading...</div>
-      ) : (
-        data && <OrderTable orders={data.map((order) => ({ order: order }))} />
+      {data && (
+        <Table
+          data={data.results}
+          columns={columns}
+          rowCount={data.total}
+          pagination={pagination}
+          setPagination={setPagination}
+          manualPagination={true}
+        />
       )}
     </div>
   );
