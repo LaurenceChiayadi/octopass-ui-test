@@ -1,12 +1,13 @@
 import { API_BASE_URL } from "../constants/api";
 
-export const fetchCustomers = async (options: {
-  pageIndex: number;
-  pageSize: number;
-}) => {
+export const fetchCustomers = async (params: IAPIParams) => {
   const url = new URL("/query/customers", API_BASE_URL);
-  url.searchParams.append("skip", options.pageIndex.toString());
-  url.searchParams.append("take", options.pageSize.toString());
+  if (params.sortField && params.sortDirection) {
+    url.searchParams.append(
+      params.sortDirection === "asc" ? "OrderBy" : "OrderByDesc",
+      params.sortField
+    );
+  }
   const response = await fetch(url.toString(), {
     method: "GET",
     headers: {

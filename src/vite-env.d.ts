@@ -50,3 +50,10 @@ interface IOrder {
   order: IOrderInfo;
   orderDetails: IOrderDetail[];
 }
+
+interface IAPIParams {
+  pageIndex?: number;
+  pageSize?: number;
+  sortField?: string;
+  sortDirection?: "asc" | "desc";
+}

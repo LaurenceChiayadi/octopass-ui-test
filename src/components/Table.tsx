@@ -42,7 +42,7 @@ const Table = <T,>({
     getPaginationRowModel: getPaginationRowModel(),
     getRowCanExpand: () => Boolean(renderSubComponent),
     onPaginationChange: setPagination,
-    manualPagination: manualPagination,
+    // manualPagination: manualPagination,
     state: {
       pagination,
     },

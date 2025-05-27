@@ -41,21 +41,19 @@ const OrderTable = (props: OrderTableProps) => {
         header: "Employee ID",
       },
       {
-        accessorKey: "order.orderDate",
+        accessorFn: (row) => row.order.orderDate,
         header: "Order Date",
-        cell: (info) => convertRawDateToDate(info.row.original.order.orderDate),
+        cell: (info) => convertRawDateToDate(info.getValue() as string),
       },
       {
-        accessorKey: "order.requiredDate",
+        accessorFn: (row) => row.order.requiredDate,
         header: "Required Date",
-        cell: (info) =>
-          convertRawDateToDate(info.row.original.order.requiredDate),
+        cell: (info) => convertRawDateToDate(info.getValue() as string),
       },
       {
-        accessorKey: "order.shippedDate",
+        accessorFn: (row) => row.order.shippedDate,
         header: "Shipped Date",
-        cell: (info) =>
-          convertRawDateToDate(info.row.original.order.shippedDate),
+        cell: (info) => convertRawDateToDate(info.getValue() as string),
       },
       {
         accessorKey: "order.shipVia",
@@ -82,6 +80,8 @@ const OrderTable = (props: OrderTableProps) => {
   }): React.ReactElement => {
     return <OrderTableChild orderDetails={row.original.orderDetails} />;
   };
+
+  console.log(props.orders);
 
   if (!props.orders || props.orders.length === 0) return <></>;
 

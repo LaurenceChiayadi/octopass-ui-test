@@ -1,7 +1,14 @@
 import { API_BASE_URL } from "../constants/api";
 
-export const fetchOrders = async () => {
-  const response = await fetch(`${API_BASE_URL}/orders`, {
+export const fetchOrders = async (params: IAPIParams) => {
+  const url = new URL("/query/orders", API_BASE_URL);
+  if (params.sortField && params.sortDirection) {
+    url.searchParams.append(
+      params.sortDirection === "asc" ? "OrderBy" : "OrderByDesc",
+      params.sortField
+    );
+  }
+  const response = await fetch(url.toString(), {
     method: "GET",
     headers: {
       Accept: "application/json",

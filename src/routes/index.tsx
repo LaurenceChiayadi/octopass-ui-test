@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import type { ColumnDef, PaginationState } from "@tanstack/react-table";
-import debounce from "lodash/debounce";
+import type { ColumnDef } from "@tanstack/react-table";
 
 import { fetchCustomers } from "../api/CustomerAPI";
 import Table from "../components/Table";
@@ -11,18 +10,26 @@ export const Route = createFileRoute("/")({
   component: RouteComponent,
 });
 
+const sortableFields = [
+  "Id",
+  "CompanyName",
+  "ContactName",
+  "Address",
+  "PhoneNumber",
+];
+
 function RouteComponent() {
   const router = useRouter();
-  const [searchParams, setSearchParams] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState(searchParams);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const [sortField, setSortField] = useState(sortableFields[0]);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  // const [pagination, setPagination] = useState<PaginationState>({
+  //   pageIndex: 0,
+  //   pageSize: 10,
+  // });
 
-  const { data, error, refetch } = useQuery({
-    queryKey: ["customers", pagination],
-    queryFn: () => fetchCustomers(pagination),
+  const { data, error } = useQuery({
+    queryKey: ["customers", { sortField, sortDirection }],
+    queryFn: () => fetchCustomers({ sortField, sortDirection }),
     placeholderData: keepPreviousData,
   });
   const customersData = data ?? [];
@@ -58,62 +65,50 @@ function RouteComponent() {
     []
   );
 
+  const handleSortFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortField(e.target.value);
+  };
+
+  const handleSortDirectionChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = e.target.value as "asc" | "desc";
+    setSortDirection(value);
+  };
+
   const handleRowClick = (customer: ICustomer) => {
     router.navigate({ to: `/${customer.id}` });
   };
 
-  useEffect(() => {
-    const handler = debounce(() => {
-      setDebouncedQuery(searchParams);
-    }, 500);
-
-    handler();
-
-    return () => {
-      handler.cancel();
-    };
-  }, [searchParams]);
-
   if (error) return <div>Error: {error?.message}</div>;
-  // if (isLoading) return <div>Loading...</div>;
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-4">
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <svg
-              className="w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z"
-              />
-            </svg>
-          </div>
+        <label>
+          Sort by:
+          <select
+            id="sortField"
+            value={sortField}
+            onChange={handleSortFieldChange}
+          >
+            {sortableFields.map((option) => (
+              <option value={option}>{option}</option>
+            ))}
+          </select>
+        </label>
 
-          <input
-            type="search"
-            aria-label="Search"
-            className="w-full h-10 pl-10 pr-4 rounded border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={"Search Customer..."}
-            value={searchParams}
-            onChange={(e) => setSearchParams(e.target.value)}
-          />
-        </div>
-        <button
-          className="w-25 bg-black rounded text-white"
-          onClick={() => refetch()}
-        >
-          Search
-        </button>
+        <label>
+          Direction:
+          <select
+            id="sortDirection"
+            value={sortDirection}
+            onChange={handleSortDirectionChange}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </label>
       </div>
       <Table
         data={customersData}
