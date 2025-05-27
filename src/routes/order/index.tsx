@@ -11,24 +11,24 @@ export const Route = createFileRoute('/order/')({
 
 const sortableFields = [
   'Id',
-  'Customer Id',
-  'Employee Id',
-  'Order Date',
-  'Required Date',
-  'Shipped Date',
-  'Ship Via',
+  'CustomerId',
+  'EmployeeId',
+  'OrderDate',
+  'RequiredDate',
+  'ShippedDate',
+  'ShipVia',
   'Freight',
-  'Ship Name',
-  'Ship Address',
-  'Ship City',
-  'Ship Postal Code',
-  'Ship Country',
+  'ShipName',
+  'ShipAddress',
+  'ShipCity',
+  'ShipPostalCode',
+  'ShipCountry',
 ];
 
 function RouteComponent() {
   const [sortField, setSortField] = useState(sortableFields[0]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const { data, error } = useQuery({
+  const { data, error, isFetching } = useQuery({
     queryKey: ['orders', { sortField, sortDirection }],
     queryFn: () => fetchOrders({ sortField, sortDirection }),
   });
@@ -45,10 +45,6 @@ function RouteComponent() {
   };
 
   if (error) return <div>Error: {error?.message}</div>;
-
-  if (!data) return <div>No data found</div>;
-
-  const convertedData: IOrder[] = data.map((order) => ({ order: order }));
 
   return (
     <div className="flex flex-col gap-4">
@@ -78,7 +74,11 @@ function RouteComponent() {
           </select>
         </label>
       </div>
-      <OrderTable orders={convertedData} />
+      {isFetching ? (
+        <div>Loading...</div>
+      ) : (
+        data && <OrderTable orders={data.map((order) => ({ order: order }))} />
+      )}
     </div>
   );
 }
