@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetchCustomerDetail } from '../../api/CustomerAPI';
 import CustomerInfoPanel from '../../components/Customer/CustomerInfoPanel';
-import OrderTable from '../../components/Order/OrderTable';
+import OrderTable from '../../components/Customer/CustomerOrderTable';
 
 export const Route = createFileRoute('/customer/$customerId')({
   component: RouteComponent,

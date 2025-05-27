@@ -3,7 +3,7 @@ import type { ColumnDef, Row } from '@tanstack/react-table';
 
 import Table from '../Table';
 import { convertRawDateToDate } from '../../utils/dateUtils';
-import OrderTableChild from './OrderTableChild';
+import OrderTableChild from './CustomerOrderTableChild';
 
 interface OrderTableProps {
   orders: IOrder[];
