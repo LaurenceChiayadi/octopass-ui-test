@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState } from 'react';
 import {
   flexRender,
   getCoreRowModel,
@@ -7,51 +7,58 @@ import {
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
-} from "@tanstack/react-table";
-import type { PaginationState, Row } from "@tanstack/react-table";
+} from '@tanstack/react-table';
+import type { PaginationState, Row } from '@tanstack/react-table';
 
 interface TableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
+  rowCount?: number;
   showPagination?: boolean;
   rounded?: boolean;
   handleRowClick?: (row: T) => void;
   renderSubComponent?: (props: { row: Row<T> }) => React.ReactElement;
   manualPagination?: boolean;
+  pagination?: PaginationState;
+  setPagination?: React.Dispatch<React.SetStateAction<PaginationState>>;
 }
 
 const Table = <T,>({
   data,
   columns,
+  rowCount,
   rounded = true,
   showPagination = true,
   handleRowClick,
   renderSubComponent,
   manualPagination = false,
+  pagination,
+  setPagination,
 }: TableProps<T>) => {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [tablePagination, setTablePagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const table = useReactTable<T>({
     data,
     columns,
+    rowCount: rowCount,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getRowCanExpand: () => Boolean(renderSubComponent),
-    onPaginationChange: setPagination,
-    // manualPagination: manualPagination,
+    onPaginationChange: setPagination ?? setTablePagination,
+    manualPagination: manualPagination,
     state: {
-      pagination,
+      pagination: pagination ?? tablePagination,
     },
   });
 
   return (
     <div className="flex flex-col overflow-x-auto">
       <table
-        className={`min-w-[1000px] shadow-md overflow-hidden ${rounded && "rounded-t-lg"}`}
+        className={`min-w-[1000px] shadow-md overflow-hidden ${rounded && 'rounded-t-lg'}`}
       >
         <thead className="bg-gray-100 sticky top-0 z-10">
           {table.getHeaderGroups().map((headerGroup) => (
@@ -121,7 +128,7 @@ const Table = <T,>({
           <span className="flex items-center gap-2 text-sm text-gray-700">
             <div>Page</div>
             <strong className="font-semibold text-gray-900">
-              {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getState().pagination.pageIndex + 1} of{' '}
               {table.getPageCount().toLocaleString()}
             </strong>
           </span>
@@ -132,28 +139,28 @@ const Table = <T,>({
               onClick={() => table.firstPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              {"<<"}
+              {'<<'}
             </button>
             <button
               className="p-2 rounded bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              {"<"}
+              {'<'}
             </button>
             <button
               className="p-2 rounded bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              {">"}
+              {'>'}
             </button>
             <button
               className="p-2 rounded bg-white border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
               onClick={() => table.lastPage()}
               disabled={!table.getCanNextPage()}
             >
-              {">>"}
+              {'>>'}
             </button>
           </div>
         </div>

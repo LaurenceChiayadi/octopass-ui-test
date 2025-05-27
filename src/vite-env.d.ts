@@ -2,6 +2,7 @@
 
 interface ISuccessResponse<T> {
   results: T[];
+  total?: number;
 }
 
 interface ICustomer {
@@ -52,8 +53,7 @@ interface IOrder {
 }
 
 interface IAPIParams {
-  pageIndex?: number;
-  pageSize?: number;
+  pagination?: PaginationState;
   sortField?: string;
   sortDirection?: 'asc' | 'desc';
 }

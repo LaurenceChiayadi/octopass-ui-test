@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, PaginationState } from '@tanstack/react-table';
 
 import { fetchCustomers } from '../../api/CustomerAPI';
 import Table from '../../components/Table';
@@ -22,17 +22,28 @@ function RouteComponent() {
   const router = useRouter();
   const [sortField, setSortField] = useState(sortableFields[0]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  // const [pagination, setPagination] = useState<PaginationState>({
-  //   pageIndex: 0,
-  //   pageSize: 10,
-  // });
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const { data, error } = useQuery({
-    queryKey: ['customers', { sortField, sortDirection }],
-    queryFn: () => fetchCustomers({ sortField, sortDirection }),
+    queryKey: [
+      'customers',
+      {
+        sortField,
+        sortDirection,
+        pagination,
+      },
+    ],
+    queryFn: () =>
+      fetchCustomers({
+        sortField,
+        sortDirection,
+        pagination,
+      }),
     placeholderData: keepPreviousData,
   });
-  const customersData = data ?? [];
 
   const columns = useMemo<ColumnDef<ICustomer>[]>(
     () => [
@@ -111,9 +122,13 @@ function RouteComponent() {
         </label>
       </div>
       <Table
-        data={customersData}
+        data={data ? data.results : []}
         columns={columns}
         handleRowClick={handleRowClick}
+        pagination={pagination}
+        setPagination={setPagination}
+        rowCount={data && data.total}
+        manualPagination={true}
       />
     </div>
   );
