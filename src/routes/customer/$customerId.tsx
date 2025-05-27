@@ -1,19 +1,19 @@
-import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, useParams } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 
-import { fetchCustomerDetail } from "../api/CustomerAPI";
-import CustomerInfoPanel from "../components/Customer/CustomerInfoPanel";
-import OrderTable from "../components/Order/OrderTable";
+import { fetchCustomerDetail } from '../../api/CustomerAPI';
+import CustomerInfoPanel from '../../components/Customer/CustomerInfoPanel';
+import OrderTable from '../../components/Order/OrderTable';
 
-export const Route = createFileRoute("/$customerId")({
+export const Route = createFileRoute('/customer/$customerId')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const params = useParams({ from: "/$customerId" });
+  const params = useParams({ from: '/customer/$customerId' });
 
   const { data, error, isLoading } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ['customers'],
     queryFn: () => fetchCustomerDetail(params.customerId),
     enabled: !!params.customerId,
     refetchOnWindowFocus: true,

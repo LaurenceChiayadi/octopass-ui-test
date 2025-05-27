@@ -1,14 +1,18 @@
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 
 const routes = [
   {
-    href: "/",
-    label: "Customers",
+    href: '/',
+    label: 'Home',
   },
   {
-    href: "/order",
-    label: "Orders",
+    href: '/customer',
+    label: 'Customers',
+  },
+  {
+    href: '/order',
+    label: 'Orders',
   },
 ];
 
