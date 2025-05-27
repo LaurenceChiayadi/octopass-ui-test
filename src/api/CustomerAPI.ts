@@ -9,6 +9,10 @@ export const fetchCustomers = async (params: IAPIParams) => {
       params.sortField
     );
   }
+  if (params.filter) {
+    url.searchParams.append('CountryStartsWith', params.filter);
+  }
+
   url.searchParams.append(
     'skip',
     (params.pagination.pageIndex * params.pagination.pageSize).toString()

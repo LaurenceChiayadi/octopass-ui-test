@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { createFileRoute, useRouter } from '@tanstack/react-router';
 import type { ColumnDef, PaginationState } from '@tanstack/react-table';
@@ -20,6 +20,9 @@ const sortableFields = [
 
 function RouteComponent() {
   const router = useRouter();
+  const [countryFilter, setCountryFilter] = useState('');
+  const [debouncedCountryFilter, setDebouncedCountryFilter] =
+    useState(countryFilter);
   const [sortField, setSortField] = useState(sortableFields[0]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -34,6 +37,7 @@ function RouteComponent() {
         sortField,
         sortDirection,
         pagination,
+        debouncedCountryFilter,
       },
     ],
     queryFn: () =>
@@ -41,6 +45,7 @@ function RouteComponent() {
         sortField,
         sortDirection,
         pagination,
+        filter: debouncedCountryFilter,
       }),
     placeholderData: keepPreviousData,
   });
@@ -50,6 +55,11 @@ function RouteComponent() {
       {
         accessorKey: 'id',
         header: () => 'ID',
+        cell: (info) => info.getValue(),
+      },
+      {
+        accessorKey: 'country',
+        header: () => 'Country',
         cell: (info) => info.getValue(),
       },
       {
@@ -63,11 +73,6 @@ function RouteComponent() {
         cell: (info) => info.getValue(),
       },
       {
-        accessorKey: 'address',
-        header: () => 'Address',
-        cell: (info) => info.getValue(),
-      },
-      {
         accessorKey: 'phone',
         header: () => 'Phone Number',
         cell: (info) => info.getValue(),
@@ -75,6 +80,16 @@ function RouteComponent() {
     ],
     []
   );
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedCountryFilter(countryFilter);
+    }, 200);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [countryFilter]);
 
   const handleSortFieldChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortField(e.target.value);
@@ -95,6 +110,22 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="w-full mx-auto">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="input"
+        >
+          Country Filter
+        </label>
+        <input
+          id="input"
+          type="text"
+          value={countryFilter}
+          onChange={(e) => setCountryFilter(e.target.value)}
+          placeholder="Type something..."
+          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 bg-gray-200 leading-tight focus:outline-none focus:shadow-outline"
+        />
+      </div>
       <div className="flex gap-4">
         <label>
           Sort by:

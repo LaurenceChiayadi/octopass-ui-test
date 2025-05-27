@@ -56,4 +56,5 @@ interface IAPIParams {
   pagination?: PaginationState;
   sortField?: string;
   sortDirection?: 'asc' | 'desc';
+  filter?: string;
 }
