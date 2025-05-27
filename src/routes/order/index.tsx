@@ -162,16 +162,14 @@ function RouteComponent() {
           </select>
         </label>
       </div>
-      {data && (
-        <Table
-          data={data.results}
-          columns={columns}
-          rowCount={data.total}
-          pagination={pagination}
-          setPagination={setPagination}
-          manualPagination={true}
-        />
-      )}
+      <Table
+        data={data && data.results ? data.results : []}
+        columns={columns}
+        rowCount={data && data.total}
+        pagination={pagination}
+        setPagination={setPagination}
+        manualPagination={true}
+      />
     </div>
   );
 }
