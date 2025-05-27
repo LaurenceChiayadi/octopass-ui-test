@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { fetchCustomerDetail } from '../../api/CustomerAPI';
 import CustomerInfoPanel from '../../components/Customer/CustomerInfoPanel';
-import OrderTable from '../../components/Customer/CustomerOrderTable';
+import CustomerOrderTable from '../../components/Customer/CustomerOrderTable';
 
 export const Route = createFileRoute('/customer/$customerId')({
   component: RouteComponent,
@@ -27,7 +27,13 @@ function RouteComponent() {
     <div className="flex flex-col gap-4">
       <CustomerInfoPanel customer={data.customer} />
       <h2 className="text-xl font-semibold">Orders</h2>
-      <OrderTable orders={data.orders} />
+      {data.orders && data.orders.length > 0 ? (
+        <CustomerOrderTable orders={data.orders} />
+      ) : (
+        <div className="flex justify-center items-center min-w-[800px]">
+          Customer has no orders.
+        </div>
+      )}
     </div>
   );
 }

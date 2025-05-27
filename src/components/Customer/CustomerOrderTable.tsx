@@ -9,7 +9,7 @@ interface OrderTableProps {
   orders: IOrder[];
 }
 
-const OrderTable = (props: OrderTableProps) => {
+const CustomerOrderTable = (props: OrderTableProps) => {
   const columns = useMemo<ColumnDef<IOrder>[]>(
     () => [
       {
@@ -95,4 +95,4 @@ const OrderTable = (props: OrderTableProps) => {
   );
 };
 
-export default OrderTable;
+export default CustomerOrderTable;
